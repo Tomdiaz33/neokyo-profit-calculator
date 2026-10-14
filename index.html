@@ -1,0 +1,2403 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Neokyo Profit Calculator" />
+  <title>Neokyo Profit Calculator</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --panel: rgba(255,255,255,0.9);
+      --panel-strong: #ffffff;
+      --line: #e2e8f0;
+      --line-strong: #cbd5e1;
+      --text: #0f172a;
+      --muted: #475569;
+      --muted-soft: #64748b;
+      --amber: #f59e0b;
+      --amber-strong: #d97706;
+      --amber-soft: #fffbeb;
+      --red: #dc2626;
+      --green: #16a34a;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+      --maxw: 1200px;
+      --font-ui: "DM Sans", "Segoe UI", sans-serif;
+      --font-display: "Georgia", "Times New Roman", serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--bg); color: var(--text); }
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #f8fafc 0%, #f8fafc 52%, #fffaf0 100%);
+      color: var(--text);
+      font-family: var(--font-ui);
+    }
+    body, input, select, button, textarea {
+      font: inherit;
+    }
+
+    a { color: inherit; }
+    button, input, select {
+      transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    button:hover:not(:disabled) { transform: translateY(-1px); }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--amber) !important;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.16);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .app {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar-inner {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 18px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fbbf24, #d97706);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 18px;
+      box-shadow: var(--shadow);
+    }
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 2.4vw, 2rem);
+      letter-spacing: -0.03em;
+      font-weight: 700;
+    }
+    .brand-title em {
+      color: var(--amber-strong);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .tagline {
+      font-size: 11px;
+      color: var(--muted-soft);
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 4px;
+      flex-wrap: wrap;
+    }
+    .nav button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 9px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .nav button.active {
+      background: #0f172a;
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .main {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 22px 16px 40px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .card {
+      background: rgba(255,255,255,0.95);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+    }
+
+    .section {
+      margin-top: 18px;
+    }
+
+    .subhead {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      margin: 4px 0 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .row {
+      display: grid;
+      gap: 14px;
+    }
+
+    .row-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .row-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .row-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .row-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+    .field {
+      display: block;
+    }
+    .field label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted-soft);
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--line-strong);
+      border-radius: 14px;
+      background: white;
+      overflow: hidden;
+    }
+    .input-wrap input, .input-wrap select, .input-wrap textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 15px;
+      padding: 0 12px;
+      appearance: none;
+    }
+    .input-wrap input[type="checkbox"] {
+      width: auto;
+      min-height: auto;
+      margin: 0;
+      accent-color: var(--amber-strong);
+    }
+    .suffix {
+      white-space: nowrap;
+      padding: 0 12px;
+      background: #f8fafc;
+      border-left: 1px solid var(--line);
+      color: var(--muted-soft);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .checkline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line-strong);
+      background: white;
+      border-radius: 14px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .checkline input { margin: 0; }
+
+    .button {
+      border: 1px solid var(--line-strong);
+      background: white;
+      color: var(--text);
+      border-radius: 14px;
+      min-height: 42px;
+      padding: 10px 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .button.primary {
+      background: linear-gradient(135deg, #fbbf24, #d97706);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 10px 22px rgba(217, 119, 6, 0.2);
+    }
+    .button.flat {
+      background: #111827;
+      color: white;
+      border-color: transparent;
+    }
+    .button.warning {
+      border-color: rgba(220, 38, 38, 0.4);
+      background: rgba(254, 242, 242, 0.8);
+      color: #991b1b;
+    }
+    .button[disabled] {
+      opacity: 0.48;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .hero {
+      padding: 26px;
+      background: linear-gradient(135deg, #fef3c7 0%, #fff7ed 100%);
+      border: 1px solid rgba(245, 158, 11, 0.18);
+      border-radius: 28px;
+      overflow: hidden;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted-soft);
+      font-weight: 700;
+    }
+
+    .profit {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 6vw, 4.8rem);
+      letter-spacing: -0.05em;
+      line-height: 0.98;
+      margin-top: 8px;
+      font-weight: 700;
+    }
+    .profit.negative { color: #b91c1c; }
+    .profit.positive { color: #0f172a; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(22,163,74,0.25);
+      background: rgba(255,255,255,0.6);
+      color: var(--green);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge.warn {
+      border-color: rgba(220,38,38,0.25);
+      color: #b91c1c;
+      background: rgba(255,255,255,0.75);
+    }
+    .badge.alert {
+      border-color: rgba(245,158,11,0.25);
+      color: #92400e;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 21px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(15,23,42,0.08);
+    }
+
+    .mini-card {
+      background: rgba(255,255,255,0.65);
+      border: 1px solid rgba(148,163,184,0.32);
+      border-radius: 16px;
+      padding: 12px 12px 10px;
+    }
+    .mini-card .label {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted-soft);
+      font-weight: 700;
+    }
+    .mini-card .value {
+      margin-top: 7px;
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 1.8vw, 1.8rem);
+      letter-spacing: -0.04em;
+    }
+
+    .panel-shell {
+      background: rgba(255,255,255,0.9);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: rgba(248,250,252,0.96);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      margin-bottom: 14px;
+    }
+    .toolbar .spacer { flex: 1; }
+
+    .filter-btns {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      border: 1px solid var(--line-strong);
+      background: white;
+      border-radius: 999px;
+      min-height: 34px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .chip.active {
+      background: #0f172a;
+      color: white;
+      border-color: transparent;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: white;
+    }
+    table {
+      width: 100%;
+      min-width: 920px;
+      border-collapse: collapse;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 12px 10px;
+      border-bottom: 1px solid #eff3f8;
+    }
+    th {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted-soft);
+      background: #f8fafc;
+      font-weight: 700;
+    }
+    td input, td select {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: white;
+      padding: 0 10px;
+      font-size: 13px;
+    }
+    .money { font-variant-numeric: tabular-nums; }
+    .negative { color: var(--red); }
+    .positive { color: var(--green); }
+
+    .details {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-top: 1px solid rgba(15,23,42,0.06);
+      padding: 12px 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .summary-row strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .callout {
+      border: 1px solid rgba(245,158,11,0.25);
+      background: rgba(255,251,235,0.78);
+      color: #92400e;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.45;
+      margin-top: 12px;
+    }
+    .callout.error {
+      border-color: rgba(220,38,38,0.22);
+      background: rgba(254,242,242,0.8);
+      color: #991b1b;
+    }
+    .callout.info {
+      border-color: rgba(148,163,184,0.25);
+      background: rgba(248,250,252,0.9);
+      color: var(--muted);
+    }
+
+    .logic-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .logic-box {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .logic-box h4 {
+      font-size: 12px;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--muted-soft);
+      margin: 0 0 8px;
+      font-weight: 700;
+    }
+    .logic-box p, .logic-box li {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted-soft);
+    }
+
+    .pw {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .page-footer {
+      max-width: var(--maxw);
+      margin: 0 auto 30px;
+      padding: 0 16px;
+      font-size: 11px;
+      color: var(--muted-soft);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 860px) {
+      .row-2, .row-3, .row-4, .row-5, .mini-grid, .logic-grid { grid-template-columns: 1fr; }
+      .topbar-inner { align-items: stretch; }
+      .nav { width: 100%; }
+      .nav button { flex: 1; }
+      .hero { padding: 18px; }
+      .mini-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .mini-grid { grid-template-columns: 1fr; }
+      .details-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const STORAGE_KEY = 'neokyo_v2';
+  const STORAGE_VERSION = 2;
+  const MAX_JPY = 10000000;
+  const MAX_EUR = 100000;
+  const MAX_WEIGHT = 100;
+  const CENT = 100;
+
+  const CATEGORIES = [
+    { name: 'Sacs', rate: 0.037, hs: 'HS 4202', note: 'Indicatif – à vérifier' },
+    { name: 'Vêtements', rate: 0.12, hs: 'HS 61/62', note: 'Indicatif – à vérifier' },
+    { name: 'Maroquinerie', rate: 0.037, hs: 'HS 4202', note: 'Indicatif – à vérifier' },
+    { name: 'Foulards', rate: 0.0, hs: 'HS 6214', note: 'Indicatif – à vérifier' },
+    { name: 'Accessoires', rate: 0.037, hs: 'HS 4202/6217', note: 'Indicatif – à vérifier' },
+    { name: 'Montres', rate: 0.04, hs: 'HS 9102', note: 'Indicatif – à vérifier' },
+    { name: 'Chaussures', rate: 0.085, hs: 'HS 6403', note: 'Indicatif – à vérifier' }
+  ];
+
+  const SUBCATEGORIES = {
+    Sacs: [
+      { name: 'Sac à main petit format', weight: 0.4 },
+      { name: 'Sac à main format moyen (sans boîte)', weight: 0.7 },
+      { name: 'Sac à main format moyen (avec boîte/dustbag)', weight: 0.9 },
+      { name: 'Sac cabas/tote (sans boîte)', weight: 0.9 },
+      { name: 'Sac cabas/tote (avec boîte/dustbag)', weight: 1.1 },
+      { name: 'Sac à dos', weight: 0.8 },
+      { name: 'Pochette', weight: 0.2 }
+    ],
+    'Vêtements': [
+      { name: 'T-shirt', weight: 0.2 },
+      { name: 'Chemise', weight: 0.25 },
+      { name: 'Pull/Sweat', weight: 0.5 },
+      { name: 'Manteau/Veste', weight: 1.2 },
+      { name: 'Robe', weight: 0.35 },
+      { name: 'Jean/Pantalon', weight: 0.6 }
+    ],
+    Maroquinerie: [
+      { name: 'Portefeuille (sans boîte)', weight: 0.15 },
+      { name: 'Portefeuille (avec boîte)', weight: 0.25 },
+      { name: 'Ceinture (sans boîte)', weight: 0.25 },
+      { name: 'Ceinture (avec boîte)', weight: 0.35 },
+      { name: 'Porte-cartes (sans boîte)', weight: 0.1 },
+      { name: 'Porte-cartes (avec boîte)', weight: 0.18 }
+    ],
+    Foulards: [
+      { name: 'Foulard soie', weight: 0.1 },
+      { name: 'Écharpe', weight: 0.2 }
+    ],
+    Accessoires: [
+      { name: 'Casquette/Bonnet', weight: 0.15 },
+      { name: 'Lunettes (sans étui)', weight: 0.15 },
+      { name: 'Lunettes (avec étui)', weight: 0.3 },
+      { name: 'Ceinture accessoire', weight: 0.25 },
+      { name: 'Parfum (avec boîte)', weight: 0.5 }
+    ],
+    Montres: [
+      { name: 'Montre (sans boîte)', weight: 0.1 },
+      { name: 'Montre (avec écrin)', weight: 0.5 }
+    ],
+    Chaussures: [
+      { name: 'Sneakers (sans boîte)', weight: 0.9 },
+      { name: 'Sneakers (avec boîte)', weight: 1.4 },
+      { name: 'Bottes (sans boîte)', weight: 1.3 },
+      { name: 'Bottes (avec boîte)', weight: 1.8 },
+      { name: 'Escarpins/Talons (sans boîte)', weight: 0.7 },
+      { name: 'Escarpins/Talons (avec boîte)', weight: 1.1 },
+      { name: 'Sandales (sans boîte)', weight: 0.5 },
+      { name: 'Sandales (avec boîte)', weight: 0.9 }
+    ]
+  };
+
+  const PLATFORM_LABELS = {
+    vinted: 'Vinted',
+    vestiaire: 'Vestiaire Collective',
+    other: 'Autre / vente directe'
+  };
+
+  const DEFAULT_SETTINGS = {
+    version: STORAGE_VERSION,
+    fxRate: 158,
+    fxSpreadPct: 2,
+    neokyoServiceFeeJPY: 250,
+    neokyoPaymentPct: 0.036,
+    neokyoPaymentFixedJPY: 40,
+    neokyoPackagingJPY: 700,
+    tva: 0.20,
+    customsThresholdEUR: 150,
+    customsMode: 'threshold',
+    customsClearanceFee: 12,
+    clearanceApplies: 'always',
+    clearanceIncludedInVatBase: false,
+    japanOriginPreference: false,
+    objectiveMode: 'margin',
+    targetMargin: 0.30,
+    packaging: 3.5,
+    carrier: 'EMS',
+    carriers: {
+      EMS: { base: 15, perKg: 12, clearance: 12 },
+      DHL: { base: 22, perKg: 15, clearance: 18 },
+      FedEx: { base: 25, perKg: 16, clearance: 20 }
+    },
+    preferentialDutyRates: {
+      Sacs: 0,
+      'Vêtements': 0,
+      Maroquinerie: 0,
+      Foulards: 0,
+      Accessoires: 0,
+      Montres: 0,
+      Chaussures: 0
+    },
+    dutyRates: {
+      Sacs: 0.037,
+      'Vêtements': 0.12,
+      Maroquinerie: 0.037,
+      Foulards: 0,
+      Accessoires: 0.037,
+      Montres: 0.04,
+      Chaussures: 0.085
+    },
+    platformFees: {
+      vinted: { commission: 0, fixed: 0, label: 'Vinted' },
+      vestiaire: { commission: 0.15, fixed: 0, label: 'Vestiaire Collective' },
+      other: { commission: 0, fixed: 0, label: 'Autre / vente directe' }
+    },
+    smallParcelFlatDutyEUR: 0,
+    smallParcelFlatDutyComment: 'Indicatif – à vérifier avant usage',
+    customsLabel: 'Taux de droit commun (hors origine préférentielle APE)'
+  };
+
+  const DEFAULT_ARTICLE = {
+    id: null,
+    ref: 'Article 1',
+    category: CATEGORIES[0].name,
+    priceJPY: 150000,
+    priceEUR: 0,
+    weight: 0.9,
+    subCategory: '',
+    manualShipping: 0,
+    manualCost: 0,
+    targetSell: 0,
+    minProfit: 0,
+    targetMarginOverride: null,
+    sourceUrl: '',
+    advanced: false,
+    objectiveMode: 'margin',
+    platform: 'vinted',
+    carrier: 'EMS'
+  };
+
+  function clamp(value, min, max) {
+    if (!Number.isFinite(value)) return min;
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function roundMoney(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 0;
+    return Math.round(n * CENT) / CENT;
+  }
+
+  function parseNumber(v, fallback = 0) {
+    if (v === null || v === undefined || v === '') return fallback;
+    if (typeof v === 'number' && Number.isFinite(v)) return v;
+    const s = String(v).replace(/ /g, '').replace(',', '.');
+    const n = Number(s);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function fmtEUR(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '0,00 €';
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+  }
+
+  function fmtJPY(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '0 ¥';
+    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(n) + ' ¥';
+  }
+
+  function fmtPct(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '0 %';
+    return (n * 100).toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + ' %';
+  }
+
+  function safeNumber(value, max = MAX_EUR, min = 0) {
+    const n = parseNumber(value, 0);
+    if (!Number.isFinite(n)) return min;
+    return clamp(n, min, max);
+  }
+
+  function safePositiveNumber(value, max = MAX_EUR) {
+    return safeNumber(value, max, 0);
+  }
+
+  function safeJPY(value) {
+    return safeNumber(value, MAX_JPY, 0);
+  }
+
+  function uuid() {
+    if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+    return 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+  }
+
+  function getCategoryData(name) {
+    return CATEGORIES.find(item => item.name === name) || CATEGORIES[0];
+  }
+
+  function getSubcategories(categoryName) {
+    return Array.isArray(SUBCATEGORIES[categoryName]) ? SUBCATEGORIES[categoryName] : [];
+  }
+
+  function getSubcategoryWeight(categoryName, subCategory) {
+    const items = getSubcategories(categoryName);
+    const found = items.find(item => item.name === subCategory);
+    return found ? found.weight : null;
+  }
+
+  function normalizeSettings(source) {
+    const s = source && typeof source === 'object' ? source : {};
+    const base = { ...DEFAULT_SETTINGS, ...s };
+    const carriers = { ...DEFAULT_SETTINGS.carriers, ...(s.carriers || {}) };
+    const dutyRates = { ...DEFAULT_SETTINGS.dutyRates, ...(s.dutyRates || {}) };
+    const preferentialDutyRates = { ...DEFAULT_SETTINGS.preferentialDutyRates, ...(s.preferentialDutyRates || {}) };
+    const platformFees = { ...DEFAULT_SETTINGS.platformFees, ...(s.platformFees || {}) };
+    return {
+      ...base,
+      fxRate: safeNumber(base.fxRate, 1000000, 1),
+      fxSpreadPct: clamp(parseNumber(base.fxSpreadPct, 0), 0, 20),
+      neokyoServiceFeeJPY: safeJPY(base.neokyoServiceFeeJPY),
+      neokyoPaymentPct: clamp(parseNumber(base.neokyoPaymentPct, 0), 0, 1),
+      neokyoPaymentFixedJPY: safeJPY(base.neokyoPaymentFixedJPY),
+      neokyoPackagingJPY: safeJPY(base.neokyoPackagingJPY),
+      tva: clamp(parseNumber(base.tva, 0), 0, 0.30),
+      customsThresholdEUR: safePositiveNumber(base.customsThresholdEUR, 100000),
+      customsMode: base.customsMode === 'from_first_euro' ? 'from_first_euro' : 'threshold',
+      customsClearanceFee: safePositiveNumber(base.customsClearanceFee, 10000),
+      clearanceApplies: base.clearanceApplies === 'only_if_duty' ? 'only_if_duty' : 'always',
+      clearanceIncludedInVatBase: !!base.clearanceIncludedInVatBase,
+      japanOriginPreference: !!base.japanOriginPreference,
+      objectiveMode: base.objectiveMode === 'profit' ? 'profit' : 'margin',
+      targetMargin: clamp(parseNumber(base.targetMargin, 0.3), 0, 0.95),
+      packaging: safePositiveNumber(base.packaging, 1000),
+      carrier: typeof base.carrier === 'string' && carriers[base.carrier] ? base.carrier : 'EMS',
+      carriers,
+      preferentialDutyRates,
+      dutyRates,
+      platformFees,
+      smallParcelFlatDutyEUR: safePositiveNumber(base.smallParcelFlatDutyEUR, 1000),
+      customsLabel: base.customsLabel || DEFAULT_SETTINGS.customsLabel
+    };
+  }
+
+  function normalizeArticle(source, fallback = DEFAULT_ARTICLE) {
+    const item = source && typeof source === 'object' ? source : {};
+    const category = CATEGORIES.some(c => c.name === item.category) ? item.category : fallback.category;
+    const sub = getSubcategoryWeight(category, item.subCategory) == null ? '' : item.subCategory;
+    const normalized = {
+      ...fallback,
+      ...item,
+      id: item.id || uuid(),
+      ref: item.ref || fallback.ref || 'Article',
+      category,
+      subCategory: sub,
+      priceJPY: safeJPY(item.priceJPY),
+      priceEUR: safePositiveNumber(item.priceEUR, MAX_EUR),
+      weight: safePositiveNumber(item.weight, MAX_WEIGHT),
+      manualShipping: safePositiveNumber(item.manualShipping, MAX_EUR),
+      manualCost: safePositiveNumber(item.manualCost, MAX_EUR),
+      targetSell: safePositiveNumber(item.targetSell, MAX_EUR),
+      minProfit: safePositiveNumber(item.minProfit, MAX_EUR),
+      targetMarginOverride: item.targetMarginOverride == null || item.targetMarginOverride === '' ? null : clamp(parseNumber(item.targetMarginOverride, 0), 0, 95),
+      objectiveMode: item.objectiveMode === 'profit' ? 'profit' : 'margin',
+      platform: item.platform && PLATFORM_LABELS[item.platform] ? item.platform : 'vinted',
+      carrier: item.carrier && (DEFAULT_SETTINGS.carriers[item.carrier] || (item.carrier && item.carrier === 'EMS')) ? item.carrier : 'EMS'
+    };
+    return normalized;
+  }
+
+  function calcPurchase(itemJPY, itemEUR, settings) {
+    const spreadPct = clamp(parseNumber(settings.fxSpreadPct, 0), 0, 20);
+    const fxRate = Math.max(0.01, settings.fxRate / (1 + spreadPct / 100));
+    const itemJPYValue = safeJPY(itemJPY);
+    const priceEUR = itemJPYValue > 0 ? roundMoney(itemJPYValue / fxRate) : roundMoney(safePositiveNumber(itemEUR, MAX_EUR));
+    const serviceEUR = roundMoney((safeJPY(settings.neokyoServiceFeeJPY) + safeJPY(settings.neokyoPackagingJPY)) / fxRate);
+    const paymentEUR = roundMoney((itemJPYValue * clamp(parseNumber(settings.neokyoPaymentPct, 0), 0, 1) + safeJPY(settings.neokyoPaymentFixedJPY)) / fxRate);
+    const purchaseTotal = roundMoney(priceEUR + serviceEUR + paymentEUR);
+    return {
+      itemJPYValue,
+      priceEUR,
+      serviceEUR,
+      paymentEUR,
+      purchaseTotal
+    };
+  }
+
+  function calcShipping(itemWeight, manualShipping, carrier, settings) {
+    const baseCarrier = carrier || settings.carriers[settings.carrier];
+    const base = parseNumber(baseCarrier && baseCarrier.base, 0);
+    const perKg = parseNumber(baseCarrier && baseCarrier.perKg, 0);
+    const estimated = base + safePositiveNumber(itemWeight, MAX_WEIGHT) * perKg + safePositiveNumber(settings.packaging, 1000);
+    const forced = safePositiveNumber(manualShipping, MAX_EUR);
+    return forced > 0 ? roundMoney(forced) : roundMoney(estimated);
+  }
+
+  function calcTax(cif, dutyRate, settings, carrierCfg, options = {}) {
+    const customsMode = options.customsMode || settings.customsMode || 'threshold';
+    const threshold = safePositiveNumber(settings.customsThresholdEUR, 100000);
+    const fee = parseNumber((carrierCfg && carrierCfg.clearance) != null ? carrierCfg.clearance : settings.customsClearanceFee, 0);
+    const dutyApplies = customsMode === 'from_first_euro' || cif >= threshold;
+    let duty = 0;
+    if (dutyApplies) {
+      const flatDuty = safePositiveNumber(settings.smallParcelFlatDutyEUR, 1000);
+      if (flatDuty > 0 && cif < threshold) {
+        duty = flatDuty;
+      } else {
+        duty = roundMoney(cif * clamp(parseNumber(dutyRate, 0), 0, 1));
+      }
+    }
+    const clearance = settings.clearanceApplies === 'always'
+      ? (dutyApplies ? roundMoney(fee) : roundMoney(fee))
+      : (dutyApplies ? roundMoney(fee) : 0);
+
+    const taxableBase = cif + duty + (settings.clearanceIncludedInVatBase ? clearance : 0);
+    const tva = roundMoney(taxableBase * clamp(parseNumber(settings.tva, 0), 0, 0.30));
+    return {
+      duty,
+      clearance,
+      tva,
+      taxableBase,
+      total: roundMoney(duty + clearance + tva)
+    };
+  }
+
+  function calcSellingFees(sellPrice, platform, settings) {
+    const fees = settings.platformFees && settings.platformFees[platform] ? settings.platformFees[platform] : { commission: 0, fixed: 0 };
+    const commission = clamp(parseNumber(fees.commission, 0), 0, 1);
+    const fixed = safePositiveNumber(fees.fixed, MAX_EUR);
+    const value = safePositiveNumber(sellPrice, MAX_EUR);
+    return roundMoney(value * commission + fixed);
+  }
+
+  function calcNetRevenue(sellPrice, sellingFees) {
+    return roundMoney(Math.max(0, safePositiveNumber(sellPrice, MAX_EUR) - safePositiveNumber(sellingFees, MAX_EUR)));
+  }
+
+  function calcProfit(netRevenue, totalCost) {
+    return roundMoney(safePositiveNumber(netRevenue, MAX_EUR) - safePositiveNumber(totalCost, MAX_EUR));
+  }
+
+  function calcMargin(profit, sellPrice) {
+    const price = safePositiveNumber(sellPrice, MAX_EUR);
+    if (price <= 0) return 0;
+    return roundMoney(profit / price);
+  }
+
+  function calcRowResult(item, settings) {
+    const category = getCategoryData(item.category || CATEGORIES[0].name);
+    const carrierKey = item.carrier || settings.carrier;
+    const carrier = settings.carriers && settings.carriers[carrierKey] ? settings.carriers[carrierKey] : { base: 0, perKg: 0, clearance: settings.customsClearanceFee || 0 };
+    const purchase = calcPurchase(item.priceJPY, item.priceEUR, settings);
+    const shipping = calcShipping(item.weight, item.manualShipping, carrier, settings);
+    const cif = roundMoney(purchase.purchaseTotal + shipping);
+    const rate = settings.japanOriginPreference
+      ? clamp(parseNumber((settings.preferentialDutyRates || {})[category.name], 0), 0, 1)
+      : clamp(parseNumber((settings.dutyRates || {})[category.name], category.rate), 0, 1);
+    const taxes = calcTax(cif, rate, settings, carrier, { customsMode: settings.customsMode });
+    const totalCost = roundMoney(purchase.purchaseTotal + shipping + taxes.total);
+    const platform = item.platform || 'vinted';
+    const fees = calcSellingFees(item.targetSell > 0 ? item.targetSell : 0, platform, settings);
+    const sellPrice = safePositiveNumber(item.targetSell, MAX_EUR);
+    const netRevenue = calcNetRevenue(sellPrice, fees);
+    const profit = calcProfit(netRevenue, totalCost);
+    const margin = calcMargin(profit, sellPrice);
+    return {
+      category,
+      purchase,
+      shipping,
+      cif,
+      duty: taxes.duty,
+      tva: taxes.tva,
+      clearance: taxes.clearance,
+      totalCost,
+      sellingFees: fees,
+      sellPrice,
+      netRevenue,
+      profit,
+      margin,
+      roi: totalCost > 0 ? roundMoney(profit / totalCost) : 0,
+      platform
+    };
+  }
+
+  function getPlatformFees(platform, settings) {
+    const defaults = settings.platformFees || DEFAULT_SETTINGS.platformFees;
+    const pf = defaults[platform] || defaults.vinted || { commission: 0, fixed: 0 };
+    return {
+      commission: clamp(parseNumber(pf.commission, 0), 0, 1),
+      fixed: safePositiveNumber(pf.fixed, MAX_EUR),
+      label: pf.label || PLATFORM_LABELS[platform] || 'Plateforme'
+    };
+  }
+
+  function getRecommendedPrice(totalCost, settings, objectiveMode, minProfit, platform, targetMarginOverride) {
+    const platformFees = getPlatformFees(platform, settings);
+    const targetMargin = targetMarginOverride == null ? clamp(parseNumber(settings.targetMargin, 0.3), 0, 0.95) : clamp(parseNumber(targetMarginOverride, 0), 0, 0.95);
+    if (objectiveMode === 'profit') {
+      const price = calculateOptimalSellPrice(totalCost, 'profit', safePositiveNumber(minProfit, MAX_EUR), platformFees.commission, platformFees.fixed);
+      return roundMoney(price);
+    }
+    const denominator = 1 - platformFees.commission - targetMargin;
+    if (denominator <= 0) return 0;
+    return roundMoney((totalCost + platformFees.fixed) / denominator);
+  }
+
+  function calculateOptimalSellPrice(totalCost, objectiveType, objectiveValue, platformCommissionPct, platformFixedFee) {
+    const cost = Math.max(0, safePositiveNumber(totalCost, MAX_EUR));
+    const commission = clamp(parseNumber(platformCommissionPct, 0), 0, 1);
+    const fixed = safePositiveNumber(platformFixedFee, MAX_EUR);
+    const value = Math.max(0, safePositiveNumber(objectiveValue, MAX_EUR));
+    const factor = 1 - commission;
+    if (factor <= 0) return 0;
+    if (objectiveType === 'margin') {
+      const denominator = factor - clamp(parseNumber(value, 0), 0, 0.999999);
+      return denominator > 0 ? roundMoney(Math.max(0, (cost + fixed) / denominator)) : 0;
+    }
+    if (objectiveType === 'profit') {
+      return roundMoney(Math.max(0, (cost + value + fixed) / factor));
+    }
+    return 0;
+  }
+
+  function calculateMaxPurchasePrice(sellPrice, settings, options = {}) {
+    const objectiveMode = options.objectiveMode || 'margin';
+    const minProfit = safePositiveNumber(options.minProfit || 0, MAX_EUR);
+    const platform = options.platform || 'vinted';
+    const targetMargin = clamp(parseNumber(options.targetMargin, parseNumber(settings.targetMargin, 0.3)), 0, 0.95);
+    const validSell = safePositiveNumber(sellPrice, MAX_EUR);
+    if (validSell <= 0) return { eur: 0, jpy: 0, maxTotalCost: 0, data: null, reason: 'missing_sell_price' };
+
+    const pf = getPlatformFees(platform, settings);
+    const sellingFees = calcSellingFees(validSell, platform, settings);
+    const netRevenue = calcNetRevenue(validSell, sellingFees);
+
+    const maxAllowedCost = objectiveMode === 'profit'
+      ? Math.max(0, netRevenue - minProfit)
+      : Math.max(0, netRevenue * (1 - targetMargin));
+
+    if (maxAllowedCost <= 0) {
+      return { eur: 0, jpy: 0, maxTotalCost: 0, data: null, reason: 'not_feasible' };
+    }
+
+    const threshold = safePositiveNumber(settings.customsThresholdEUR, 150);
+    const fxSpread = clamp(parseNumber(settings.fxSpreadPct, 0), 0, 20);
+    const fxRate = Math.max(0.01, settings.fxRate / (1 + fxSpread / 100));
+    const candidateScale = [0, threshold - 0.01, threshold, threshold + 0.01, 100, 200, 500, 1000, 2000, 5000, 10000];
+    let best = 0;
+
+    function evaluateAtEUR(eur) {
+      const item = normalizeArticle({
+        id: 'max-buy',
+        ref: 'MAX BUY',
+        category: options.category || CATEGORIES[0].name,
+        priceJPY: eur * fxRate,
+        priceEUR: 0,
+        weight: parseNumber(options.weight, 0.8),
+        platform,
+        carrier: settings.carrier
+      }, DEFAULT_ARTICLE);
+
+      const purchase = calcPurchase(item.priceJPY, item.priceEUR, settings);
+      const carrier = settings.carriers[settings.carrier] || settings.carriers.EMS || { base: 0, perKg: 0, clearance: settings.customsClearanceFee || 0 };
+      const shipping = calcShipping(item.weight, item.manualShipping || 0, carrier, settings);
+      const cif = roundMoney(purchase.purchaseTotal + shipping);
+      const dutyRate = settings.japanOriginPreference
+        ? clamp(parseNumber((settings.preferentialDutyRates || {})[item.category], 0), 0, 1)
+        : clamp(parseNumber((settings.dutyRates || {})[item.category], getCategoryData(item.category).rate), 0, 1);
+      const taxes = calcTax(cif, dutyRate, settings, carrier, { customsMode: settings.customsMode });
+      const totalCost = roundMoney(purchase.purchaseTotal + shipping + taxes.total);
+
+      const net = calcNetRevenue(validSell, calcSellingFees(validSell, platform, settings));
+      const profitValue = roundMoney(net - totalCost);
+      const marginValue = calcMargin(profitValue, validSell);
+
+      const feasible = totalCost <= maxAllowedCost + 0.01 && profitValue >= minProfit - 0.01 && (
+        objectiveMode === 'profit' ? profitValue >= minProfit - 0.01 : (marginValue >= targetMargin - 0.0001 || targetMargin === 0)
+      );
+      return { totalCost, profitValue, marginValue, feasible };
+    }
+
+    const uniq = [...new Set(candidateScale.filter(v => Number.isFinite(v)))].sort((a, b) => a - b);
+    let lastFeasible = 0;
+    for (const sample of uniq) {
+      const result = evaluateAtEUR(sample);
+      if (result.feasible) lastFeasible = sample;
+    }
+
+    if (lastFeasible <= 0) {
+      return { eur: 0, jpy: 0, maxTotalCost: roundMoney(maxAllowedCost), data: null, reason: 'no_feasible_value' };
+    }
+
+    let lo = 0;
+    let hi = lastFeasible;
+    for (let i = 0; i < 80; i++) {
+      const mid = (lo + hi) / 2;
+      const result = evaluateAtEUR(mid);
+      if (result.feasible) {
+        lo = mid;
+        best = mid;
+      } else {
+        hi = mid;
+      }
+    }
+
+    const finalEUR = roundMoney(best);
+    return {
+      eur: finalEUR,
+      jpy: roundMoney(finalEUR * fxRate),
+      maxTotalCost: roundMoney(maxAllowedCost),
+      data: evaluateAtEUR(finalEUR),
+      reason: null
+    };
+  }
+
+  function computeParcel(items, settings) {
+    const safeSettings = normalizeSettings(settings);
+    const rows = (Array.isArray(items) ? items : []).map((item, index) => {
+      const normalized = normalizeArticle(item, { ...DEFAULT_ARTICLE, ref: 'Article ' + (index + 1), id: uuid() });
+      const category = getCategoryData(normalized.category);
+      const carrierKey = normalized.carrier || safeSettings.carrier;
+      const carrier = safeSettings.carriers && safeSettings.carriers[carrierKey]
+        ? safeSettings.carriers[carrierKey]
+        : { base: 0, perKg: 0, clearance: safeSettings.customsClearanceFee || 0 };
+
+      const purchase = calcPurchase(normalized.priceJPY, normalized.priceEUR, safeSettings);
+      const itemWeight = safePositiveNumber(normalized.weight, MAX_WEIGHT);
+      const shipping = calcShipping(itemWeight, normalized.manualShipping, carrier, safeSettings);
+      const cif = roundMoney(purchase.purchaseTotal + shipping);
+      const rate = safeSettings.japanOriginPreference
+        ? clamp(parseNumber((safeSettings.preferentialDutyRates || {})[category.name], 0), 0, 1)
+        : clamp(parseNumber((safeSettings.dutyRates || {})[category.name], category.rate), 0, 1);
+      return {
+        ...normalized,
+        categoryMeta: category,
+        carrierKey,
+        carrier,
+        purchase,
+        shipping,
+        cif,
+        dutyRate: rate,
+      };
+    });
+
+    if (!rows.length) {
+      return {
+        rows: [],
+        totalBillableWeight: 0,
+        totalShipping: 0,
+        totalCif: 0,
+        totalDuty: 0,
+        totalTva: 0,
+        totalClearance: 0,
+        totalCost: 0,
+        grandTotal: 0
+      };
+    }
+
+    const totalWeight = rows.reduce((sum, i) => sum + safePositiveNumber(i.weight, MAX_WEIGHT), 0);
+    const tare = rows.length ? (totalWeight < 2 ? 0.35 : totalWeight <= 5 ? 0.7 : 1.3) : 0;
+    const totalBillableWeight = totalWeight + tare;
+    const shipmentBase = safePositiveNumber((safeSettings.carriers && safeSettings.carriers[safeSettings.carrier] && safeSettings.carriers[safeSettings.carrier].base) || 0, 10000);
+    const shipmentPerKg = safePositiveNumber((safeSettings.carriers && safeSettings.carriers[safeSettings.carrier] && safeSettings.carriers[safeSettings.carrier].perKg) || 0, 10000);
+    const totalShipping = roundMoney(shipmentBase + totalBillableWeight * shipmentPerKg + safePositiveNumber(safeSettings.packaging, 1000));
+
+    const weightTotal = rows.reduce((sum, row) => sum + safePositiveNumber(row.weight, MAX_WEIGHT), 0) || rows.length;
+    const allocatedShipping = rows.map((row, idx) => {
+      const share = weightTotal > 0 ? totalShipping * (safePositiveNumber(row.weight, MAX_WEIGHT) / weightTotal) : totalShipping / rows.length;
+      const value = roundMoney(share);
+      return value;
+    });
+    const shippingRemainder = roundMoney(totalShipping - allocatedShipping.reduce((s, v) => s + v, 0));
+    allocatedShipping[allocatedShipping.length - 1] = roundMoney(allocatedShipping[allocatedShipping.length - 1] + shippingRemainder);
+
+    const rowsWithShipping = rows.map((row, idx) => {
+      const shippingShare = allocatedShipping[idx];
+      const cifVal = roundMoney(row.purchase.purchaseTotal + shippingShare);
+      return { ...row, shippingShare, cif: cifVal };
+    });
+
+    const totalCif = roundMoney(rowsWithShipping.reduce((sum, row) => sum + row.cif, 0));
+    const totalFee = parseNumber((safeSettings.carriers && safeSettings.carriers[safeSettings.carrier] && safeSettings.carriers[safeSettings.carrier].clearance) != null
+      ? safeSettings.carriers[safeSettings.carrier].clearance
+      : safeSettings.customsClearanceFee, 0);
+
+    const customsMode = safeSettings.customsMode || 'threshold';
+    const dutyApplies = customsMode === 'from_first_euro' || totalCif >= safePositiveNumber(safeSettings.customsThresholdEUR, 150);
+    const clearanceTotal = safeSettings.clearanceApplies === 'always'
+      ? roundMoney(totalFee)
+      : dutyApplies ? roundMoney(totalFee) : 0;
+
+    let dutyTotal = 0;
+    if (dutyApplies) {
+      const flatDuty = safePositiveNumber(safeSettings.smallParcelFlatDutyEUR, 1000);
+      if (flatDuty > 0 && totalCif < safePositiveNumber(safeSettings.customsThresholdEUR, 150)) {
+        dutyTotal = flatDuty;
+      } else {
+        const aggregateRate = safeSettings.japanOriginPreference
+          ? 0
+          : rowsWithShipping.reduce((sum, row) => sum + row.cif * row.dutyRate, 0) / Math.max(totalCif, 0.0001);
+        dutyTotal = roundMoney(totalCif * clamp(parseNumber(aggregateRate, 0), 0, 1));
+      }
+    }
+
+    let totalDuty = roundMoney(dutyTotal);
+    let totalTva = 0;
+    let totalClearance = roundMoney(clearanceTotal);
+
+    const withTaxes = rowsWithShipping.map((row) => {
+      const dutyBase = totalCif > 0 ? roundMoney((totalDuty * row.cif) / totalCif) : 0;
+      const clearanceShare = totalCif > 0 ? roundMoney((totalClearance * row.cif) / totalCif) : 0;
+      const taxableBase = row.cif + dutyBase + (safeSettings.clearanceIncludedInVatBase ? clearanceShare : 0);
+      const tvaShare = roundMoney(taxableBase * clamp(parseNumber(safeSettings.tva, 0), 0, 0.30));
+      const totalCostRow = roundMoney(row.purchase.purchaseTotal + row.shippingShare + dutyBase + clearanceShare + tvaShare);
+      return {
+        ...row,
+        duty: dutyBase,
+        clearance: clearanceShare,
+        tva: tvaShare,
+        totalCost: totalCostRow,
+      };
+    });
+
+    totalTva = roundMoney(withTaxes.reduce((sum, row) => sum + row.tva, 0));
+    totalDuty = roundMoney(withTaxes.reduce((sum, row) => sum + row.duty, 0));
+    totalClearance = roundMoney(withTaxes.reduce((sum, row) => sum + row.clearance, 0));
+
+    const finalRows = withTaxes.map((row) => {
+      const targetMargin = safeSettings.targetMargin;
+      const objectiveMode = row.objectiveMode || safeSettings.objectiveMode || 'margin';
+      const platform = row.platform || 'vinted';
+      const pf = getPlatformFees(platform, safeSettings);
+      const minProfit = safePositiveNumber(row.minProfit, MAX_EUR);
+      const targetMarginOverride = row.targetMarginOverride == null ? null : clamp(parseNumber(row.targetMarginOverride, targetMargin) / 100, 0, 0.95);
+      const recommended = objectiveMode === 'profit'
+        ? calculateOptimalSellPrice(row.totalCost, 'profit', minProfit, pf.commission, pf.fixed)
+        : (() => {
+            const denominator = 1 - pf.commission - (targetMarginOverride == null ? targetMargin : targetMarginOverride);
+            if (denominator <= 0) return 0;
+            return roundMoney((row.totalCost + pf.fixed) / denominator);
+          })();
+
+      const sellPrice = row.targetSell > 0 ? row.targetSell : recommended;
+      const sellingFees = calcSellingFees(sellPrice, platform, safeSettings);
+      const netRevenue = calcNetRevenue(sellPrice, sellingFees);
+      const profit = roundMoney(netRevenue - row.totalCost);
+      const margin = calcMargin(profit, sellPrice);
+      return {
+        ...row,
+        platform,
+        targetMargin: targetMarginOverride == null ? targetMargin : targetMarginOverride,
+        recommendedPrice: roundMoney(recommended),
+        sellPrice: roundMoney(sellPrice),
+        sellingFees,
+        netRevenue,
+        profit,
+        margin,
+        roi: row.totalCost > 0 ? roundMoney(profit / row.totalCost) : 0
+      };
+    });
+
+    const grandTotal = roundMoney(finalRows.reduce((sum, row) => sum + row.totalCost, 0));
+    return {
+      rows: finalRows,
+      totalBillableWeight,
+      totalShipping,
+      totalCif,
+      totalDuty,
+      totalTva,
+      totalClearance,
+      totalCost: grandTotal,
+      grandTotal
+    };
+  }
+
+  function formatSellPreview(sellPrice, platform, settings, objectiveMode, targetMarginOverride) {
+    const pf = getPlatformFees(platform, settings);
+    const margin = targetMarginOverride == null ? settings.targetMargin : clamp(parseNumber(targetMarginOverride, settings.targetMargin), 0, 0.95);
+    const objective = objectiveMode === 'profit' ? 'profit' : 'margin';
+    if (!sellPrice || sellPrice <= 0) return '—';
+    const fees = calcSellingFees(sellPrice, platform, settings);
+    const netRevenue = calcNetRevenue(sellPrice, fees);
+    return `${fmtEUR(netRevenue)} net • ${fmtEUR(fees)} de frais`;
+  }
+
+  function renderCalc(state) {
+    const article = state.article;
+    const settings = state.settings;
+    const targetMargin = article.targetMarginOverride == null ? settings.targetMargin : clamp(parseNumber(article.targetMarginOverride, settings.targetMargin), 0, 0.95);
+    const objectiveMode = article.objectiveMode === 'profit' ? 'profit' : 'margin';
+    const platform = article.platform || 'vinted';
+    const pf = getPlatformFees(platform, settings);
+
+    const calc = computeParcel([article], settings);
+    const row = calc.rows[0] || {
+      totalCost: 0,
+      profit: 0,
+      margin: 0,
+      netRevenue: 0,
+      sellPrice: 0,
+      recommendedPrice: 0,
+      purchase: { priceEUR: 0, purchaseTotal: 0 },
+      shipping: 0,
+      duty: 0,
+      tva: 0,
+      clearance: 0
+    };
+
+    const sellTarget = safePositiveNumber(article.targetSell, MAX_EUR);
+    const recommendedPrice = row.recommendedPrice || 0;
+    const usedSell = sellTarget > 0 ? sellTarget : recommendedPrice;
+
+    const netAfterFees = calcNetRevenue(usedSell, calcSellingFees(usedSell, platform, settings));
+    const maxPurchase = calculateMaxPurchasePrice(usedSell, settings, {
+      objectiveMode,
+      minProfit: article.minProfit,
+      targetMargin,
+      platform,
+      category: article.category,
+      weight: article.weight
+    });
+
+    const warning = [];
+    if (article.weight <= 0) warning.push('Poids = 0 : estimation de port non fiable.');
+    if (article.priceJPY <= 0 && article.priceEUR <= 0) warning.push('Prix d’achat non renseigné.');
+    if (targetMargin >= 0.99) warning.push('Marge cible très élevée : risque d’achat impossible.');
+    if (settings.fxRate > 300 || settings.fxRate < 50) warning.push('Taux de change inhabituel : vérifie le taux actuel.');
+    if (!window.localStorage) warning.push('localStorage indisponible : paramètres non sauvegardés.');
+
+    const alerts = warning.length
+      ? '<div class="callout">' + warning.map(w => '<div>• ' + w + '</div>').join('') + '</div>'
+      : '';
+
+    const objectiveMarkup = objectiveMode === 'profit'
+      ? `
+        <label class="field">
+          <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Bénéfice minimum</span>
+          <div class="input-wrap">
+            <input data-field="minProfit" value="${article.minProfit}" inputmode="decimal" step="0.01" />
+            <span class="suffix">€</span>
+          </div>
+        </label>
+      `
+      : `
+        <label class="field">
+          <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Marge cible</span>
+          <div class="input-wrap">
+            <input data-field="targetMarginOverride" value="${article.targetMarginOverride == null ? settings.targetMargin * 100 : article.targetMarginOverride}" inputmode="decimal" step="0.1" />
+            <span class="suffix">%</span>
+          </div>
+        </label>
+      `;
+
+    return `
+      <div class="section">
+        ${alerts}
+        <div class="hero">
+          <div class="hero-top">
+            <div>
+              <span class="eyebrow">Bénéfice net</span>
+              <div class="profit ${row.profit >= 0 ? 'positive' : 'negative'}">${row.profit >= 0 ? '+' : ''}${fmtEUR(row.profit)}</div>
+            </div>
+            <div class="badge ${row.profit >= 0 ? '' : 'warn'}">
+              ${row.profit >= 0 ? '✅' : '⚠️'} ${row.profit >= 0 ? 'Rentable' : 'Non rentable'}
+            </div>
+          </div>
+          <div class="mini-grid">
+            <div class="mini-card">
+              <div class="label">Marge</div>
+              <div class="value">${fmtPct(row.margin)}</div>
+            </div>
+            <div class="mini-card">
+              <div class="label">Coût de revient</div>
+              <div class="value">${fmtEUR(row.totalCost)}</div>
+            </div>
+            <div class="mini-card">
+              <div class="label">Prix de vente</div>
+              <div class="value">${fmtEUR(usedSell)}</div>
+            </div>
+            <div class="mini-card">
+              <div class="label">Revenu net</div>
+              <div class="value">${fmtEUR(row.netRevenue)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section stack">
+        <div class="panel-shell">
+          <div class="subhead">1. Achat au Japon</div>
+          <div class="row row-2">
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Prix article (¥)</span>
+              <div class="input-wrap">
+                <input data-field="priceJPY" type="number" value="${article.priceJPY}" inputmode="decimal" step="1" min="0" max="${MAX_JPY}" />
+                <span class="suffix">JPY</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Prix EUR (si ¥ vide)</span>
+              <div class="input-wrap">
+                <input data-field="priceEUR" type="number" value="${article.priceEUR}" inputmode="decimal" step="0.01" min="0" max="${MAX_EUR}" />
+                <span class="suffix">€</span>
+              </div>
+            </label>
+          </div>
+          <div class="row row-2" style="margin-top:14px;">
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Catégorie</span>
+              <div class="input-wrap">
+                <select data-field="category">
+                  ${CATEGORIES.map(c => `<option value="${c.name}" ${article.category === c.name ? 'selected' : ''}>${c.name} — ${fmtPct(c.rate)}</option>`).join('')}
+                </select>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Sous-catégorie</span>
+              <div class="input-wrap">
+                <select data-field="subCategory">
+                  <option value="">Aucune estimation</option>
+                  ${getSubcategories(article.category).map(item => `<option value="${item.name}" ${article.subCategory === item.name ? 'selected' : ''}>${item.name} — ${item.weight} kg</option>`).join('')}
+                </select>
+              </div>
+            </label>
+          </div>
+          <div class="row row-2" style="margin-top:14px;">
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Poids</span>
+              <div class="input-wrap">
+                <input data-field="weight" type="number" value="${article.weight}" step="0.01" min="0" max="${MAX_WEIGHT}" inputmode="decimal" />
+                <span class="suffix">kg</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Transport réel</span>
+              <div class="input-wrap">
+                <input data-field="manualShipping" type="number" value="${article.manualShipping}" step="0.01" min="0" max="${MAX_EUR}" inputmode="decimal" />
+                <span class="suffix">€</span>
+              </div>
+            </label>
+          </div>
+          <div class="row row-2" style="margin-top:14px;">
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Coût manuel total</span>
+              <div class="input-wrap">
+                <input data-field="manualCost" type="number" value="${article.manualCost}" step="0.01" min="0" max="${MAX_EUR}" inputmode="decimal" />
+                <span class="suffix">€</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Transporteur</span>
+              <div class="input-wrap">
+                <select data-field="carrier">
+                  ${Object.keys(settings.carriers).map(c => `<option value="${c}" ${article.carrier === c ? 'selected' : ''}>${c}</option>`).join('')}
+                </select>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="panel-shell">
+          <div class="subhead">2. Revente en France</div>
+          <div class="row row-3">
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Plateforme</span>
+              <div class="input-wrap">
+                <select data-field="platform">
+                  ${Object.entries(PLATFORM_LABELS).map(([key, label]) => `<option value="${key}" ${article.platform === key ? 'selected' : ''}>${label}</option>`).join('')}
+                </select>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Objectif</span>
+              <div class="input-wrap">
+                <select data-field="objectiveMode">
+                  <option value="margin" ${objectiveMode === 'margin' ? 'selected' : ''}>Marge cible</option>
+                  <option value="profit" ${objectiveMode === 'profit' ? 'selected' : ''}>Bénéfice minimum</option>
+                </select>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Prix de vente</span>
+              <div class="input-wrap">
+                <input data-field="targetSell" type="number" value="${article.targetSell}" step="0.01" min="0" max="${MAX_EUR}" inputmode="decimal" />
+                <span class="suffix">€</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="row row-3" style="margin-top:12px;">
+            ${objectiveMarkup}
+            <div class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Prix de vente optimal</span>
+              <div class="input-wrap">
+                <input value="${recommendedPrice}" disabled />
+                <span class="suffix">€</span>
+              </div>
+            </div>
+            <div class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Prix d'achat max</span>
+              <div class="input-wrap">
+                <input value="${maxPurchase.eur > 0 ? maxPurchase.eur : ''}" disabled />
+                <span class="suffix">€</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pw" style="margin-top:14px;">
+            ${[20,30,50].map(v => `
+              <button class="chip ${Math.round(targetMargin * 100) === v ? 'active' : ''}" data-action="presetMargin" data-value="${v}">${v}%</button>
+            `).join('')}
+            <button class="button" data-action="useOptimalPrice">Utiliser ce prix</button>
+          </div>
+
+          <div class="summary-row" style="margin-top:18px;">
+            <span>Prix conseillé minimum</span>
+            <strong>${fmtEUR(recommendedPrice)}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Prix d’achat max (selon vente saisie)</span>
+            <strong>${usedSell > 0 ? fmtEUR(maxPurchase.eur) : 'Saisis un prix de vente'}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Frais de vente</span>
+            <strong>− ${fmtEUR(row.sellingFees || 0)}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Revenu net</span>
+            <strong>${fmtEUR(row.netRevenue || 0)}</strong>
+          </div>
+          <div class="summary-row">
+            <span>ROI</span>
+            <strong>${fmtPct(row.roi || 0)}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="section panel-shell">
+        <div class="subhead">Détail du calcul</div>
+        <div class="summary-row">
+          <span>Prix article</span>
+          <strong>${fmtEUR(row.purchase.priceEUR || 0)}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Frais Neokyo</span>
+          <strong>${fmtEUR(row.purchase.serviceEUR + row.purchase.paymentEUR)}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Port + emballage</span>
+          <strong>${fmtEUR(row.shipping || 0)}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Valeur CIF</span>
+          <strong>${fmtEUR(row.cif || 0)}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Droits de douane</span>
+          <strong>${fmtEUR(row.duty || 0)}</strong>
+        </div>
+        <div class="summary-row">
+          <span>TVA</span>
+          <strong>${fmtEUR(row.tva || 0)}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Dédouanement</span>
+          <strong>${fmtEUR(row.clearance || 0)}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Coût de revient total</span>
+          <strong>${fmtEUR(row.totalCost || 0)}</strong>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderBatch(state) {
+    const settings = state.settings;
+    const batch = state.batch;
+    const synth = computeParcel(batch, settings);
+    const rows = synth.rows;
+
+    const visible = rows.filter(row => {
+      if (state.filter === 'profitable') return row.profit >= 0;
+      if (state.filter === 'loss') return row.profit < 0;
+      return true;
+    });
+
+    const sortLabel = {
+      ref: (a, b) => a.ref.localeCompare(b.ref, 'fr'),
+      priceJPY: (a, b) => a.priceJPY - b.priceJPY,
+      cost: (a, b) => a.totalCost - b.totalCost,
+      margin: (a, b) => a.margin - b.margin,
+      profit: (a, b) => a.profit - b.profit
+    };
+
+    const sorted = [...visible].sort((a, b) => {
+      const key = state.sortKey || 'ref';
+      const dir = state.sortDirection === 'desc' ? -1 : 1;
+      const compare = sortLabel[key] ? sortLabel[key](a, b) : a.ref.localeCompare(b.ref, 'fr');
+      return compare * dir;
+    });
+
+    const grandMargin = synth.rows.length ? synth.rows.reduce((sum, r) => sum + r.netRevenue, 0) > 0
+      ? synth.rows.reduce((sum, r) => sum + r.profit, 0) / synth.rows.reduce((sum, r) => sum + r.netRevenue, 0)
+      : 0
+      : 0;
+
+    const grandROI = synth.rows.length ? synth.rows.reduce((sum, r) => sum + r.totalCost, 0) > 0
+      ? synth.rows.reduce((sum, r) => sum + r.profit, 0) / synth.rows.reduce((sum, r) => sum + r.totalCost, 0)
+      : 0
+      : 0;
+
+    return `
+      <div class="section">
+        <div class="panel-shell">
+          <div class="subhead">Synthèse du lot</div>
+          <div class="mini-grid">
+            <div class="mini-card"><div class="label">Nb articles</div><div class="value">${rows.length}</div></div>
+            <div class="mini-card"><div class="label">Coût total</div><div class="value">${fmtEUR(synth.totalCost || 0)}</div></div>
+            <div class="mini-card"><div class="label">Bénéfice</div><div class="value">${fmtEUR(rows.reduce((s, r) => s + r.profit, 0))}</div></div>
+            <div class="mini-card"><div class="label">Marge</div><div class="value">${fmtPct(grandMargin)}</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section panel-shell">
+        <div class="toolbar">
+          <button class="button primary" data-action="addBatchRow">+ Ajouter</button>
+          <button class="button" data-action="exportCsv">Exporter CSV</button>
+          <button class="button" data-action="exportJson">Exporter JSON</button>
+          <button class="button" data-action="importFileTrigger">Importer</button>
+          <input type="file" id="batchImportInput" accept=".csv,.json" style="display:none;" />
+          <div class="spacer"></div>
+          <div class="filter-btns">
+            ${[['all','Tous'],['profitable','Rentables'],['loss','Non rentables']].map(([key,label]) => `
+              <button class="chip ${state.filter === key ? 'active' : ''}" data-action="setFilter" data-value="${key}">${label}</button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th><button class="chip" data-action="sort" data-key="ref">Réf</button></th>
+                <th>Prix ¥</th>
+                <th>Prix conseillé</th>
+                <th>Coût total</th>
+                <th>Profit</th>
+                <th>Marge</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${sorted.length ? sorted.map((row) => `
+                <tr>
+                  <td><input data-row-id="${row.id}" data-field="ref" value="${row.ref || ''}" /></td>
+                  <td><input data-row-id="${row.id}" data-field="priceJPY" type="number" value="${row.priceJPY}" /></td>
+                  <td class="money">${fmtEUR(row.recommendedPrice || 0)}</td>
+                  <td class="money">${fmtEUR(row.totalCost || 0)}</td>
+                  <td class="money ${row.profit >= 0 ? 'positive' : 'negative'}">${fmtEUR(row.profit || 0)}</td>
+                  <td class="money">${fmtPct(row.margin || 0)}</td>
+                  <td>
+                    <button class="button" data-action="openInCalc" data-row-id="${row.id}">Calculer</button>
+                    <button class="button warning" data-action="removeBatchRow" data-row-id="${row.id}" style="margin-left:6px;">Suppr.</button>
+                  </td>
+                </tr>
+              `).join('') : `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted-soft);">Aucun article correspondant.</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSettings(state) {
+    const settings = state.settings;
+    const rows = [];
+    for (const c of CATEGORIES) {
+      rows.push(`
+        <div class="summary-row">
+          <span>${c.name} <span class="small">(${c.hs})</span></span>
+          <strong>
+            <input data-setting="dutyRate" data-group="${c.name}" value="${(settings.dutyRates && settings.dutyRates[c.name]) != null ? settings.dutyRates[c.name] : c.rate}" style="max-width:86px;border:1px solid var(--line-strong);border-radius:10px;padding:4px 8px;" />
+          </strong>
+        </div>
+      `);
+    }
+
+    return `
+      <div class="section stack">
+        <div class="panel-shell">
+          <div class="subhead">Réglages principaux</div>
+          <div class="row row-3">
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Taux de change</span>
+              <div class="input-wrap">
+                <input data-setting="fxRate" type="number" value="${settings.fxRate}" step="0.01" min="1" max="1000000" inputmode="decimal" />
+                <span class="suffix">¥ / €</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Spread FX</span>
+              <div class="input-wrap">
+                <input data-setting="fxSpreadPct" type="number" value="${settings.fxSpreadPct}" step="0.1" min="0" max="20" inputmode="decimal" />
+                <span class="suffix">%</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">TVA France</span>
+              <div class="input-wrap">
+                <input data-setting="tva" type="number" value="${settings.tva * 100}" step="0.1" min="0" max="30" inputmode="decimal" />
+                <span class="suffix">%</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="row row-3" style="margin-top:14px;">
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Marge cible par défaut</span>
+              <div class="input-wrap">
+                <input data-setting="targetMargin" type="number" value="${settings.targetMargin * 100}" step="0.1" min="0" max="95" inputmode="decimal" />
+                <span class="suffix">%</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Droits dès le 1er euro</span>
+              <div class="input-wrap">
+                <select data-setting="customsMode">
+                  <option value="threshold" ${settings.customsMode === 'threshold' ? 'selected' : ''}>Seuil configuré</option>
+                  <option value="from_first_euro" ${settings.customsMode === 'from_first_euro' ? 'selected' : ''}>Droits dès le 1er euro</option>
+                </select>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Origine préférentielle</span>
+              <label class="checkline">
+                <input type="checkbox" data-setting="japanOriginPreference" ${settings.japanOriginPreference ? 'checked' : ''} />
+                <span>Origine Japonaise certifiée (APE)</span>
+              </label>
+            </label>
+          </div>
+
+          <div class="row row-3" style="margin-top:14px;">
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Frais Neokyo service</span>
+              <div class="input-wrap">
+                <input data-setting="neokyoServiceFeeJPY" type="number" value="${settings.neokyoServiceFeeJPY}" step="1" min="0" max="${MAX_JPY}" inputmode="decimal" />
+                <span class="suffix">JPY</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Paiement Neokyo</span>
+              <div class="input-wrap">
+                <input data-setting="neokyoPaymentPct" type="number" value="${settings.neokyoPaymentPct * 100}" step="0.1" min="0" max="100" inputmode="decimal" />
+                <span class="suffix">%</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Packaging Neokyo</span>
+              <div class="input-wrap">
+                <input data-setting="neokyoPackagingJPY" type="number" value="${settings.neokyoPackagingJPY}" step="1" min="0" max="${MAX_JPY}" inputmode="decimal" />
+                <span class="suffix">JPY</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="panel-shell">
+          <div class="subhead">Transport & taxes</div>
+          <div class="row row-3">
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Transporteur</span>
+              <div class="input-wrap">
+                <select data-setting="carrier">
+                  ${Object.keys(settings.carriers).map(c => `<option value="${c}" ${settings.carrier === c ? 'selected' : ''}>${c}</option>`).join('')}
+                </select>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Base transport</span>
+              <div class="input-wrap">
+                <input data-setting="carrierBase" type="number" value="${settings.carriers[settings.carrier].base}" step="0.01" min="0" max="500" inputmode="decimal" />
+                <span class="suffix">€</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">€/kg</span>
+              <div class="input-wrap">
+                <input data-setting="carrierPerKg" type="number" value="${settings.carriers[settings.carrier].perKg}" step="0.01" min="0" max="200" inputmode="decimal" />
+                <span class="suffix">€/kg</span>
+              </div>
+            </label>
+          </div>
+          <div class="row row-3" style="margin-top:14px;">
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Dédouanement transporteur</span>
+              <div class="input-wrap">
+                <input data-setting="carrierClearance" type="number" value="${settings.carriers[settings.carrier].clearance}" step="0.01" min="0" max="500" inputmode="decimal" />
+                <span class="suffix">€</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Appliquer le dédouanement</span>
+              <div class="input-wrap">
+                <select data-setting="clearanceApplies">
+                  <option value="always" ${settings.clearanceApplies === 'always' ? 'selected' : ''}>Toujours</option>
+                  <option value="only_if_duty" ${settings.clearanceApplies === 'only_if_duty' ? 'selected' : ''}>Seulement si droits dus</option>
+                </select>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Seuil droits</span>
+              <div class="input-wrap">
+                <input data-setting="customsThresholdEUR" type="number" value="${settings.customsThresholdEUR}" step="1" min="0" max="100000" inputmode="decimal" />
+                <span class="suffix">€</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="row row-3" style="margin-top:14px;">
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Droit forfaitaire &lt; seuil</span>
+              <div class="input-wrap">
+                <input data-setting="smallParcelFlatDutyEUR" type="number" value="${settings.smallParcelFlatDutyEUR}" step="0.01" min="0" max="1000" inputmode="decimal" />
+                <span class="suffix">€</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Packaging</span>
+              <div class="input-wrap">
+                <input data-setting="packaging" type="number" value="${settings.packaging}" step="0.01" min="0" max="1000" inputmode="decimal" />
+                <span class="suffix">€</span>
+              </div>
+            </label>
+            <label class="field">
+              <span style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-soft);font-weight:700;margin-bottom:7px;">Inclure dédouanement dans TVA</span>
+              <label class="checkline">
+                <input type="checkbox" data-setting="clearanceIncludedInVatBase" ${settings.clearanceIncludedInVatBase ? 'checked' : ''} />
+                <span>Oui</span>
+              </label>
+            </label>
+          </div>
+
+          <div class="callout info" style="margin-top:18px;">
+            Droit forfaitaire pour les petits colis : <strong>0 € par défaut</strong> avec note <strong>TODO "à vérifier avant usage"</strong>. Ce réglage ne doit pas être utilisé sans vérification du droit en vigueur.
+          </div>
+        </div>
+
+        <div class="panel-shell">
+          <div class="subhead">Taux de droit commun (hors origine préférentielle APE)</div>
+          <div class="logic-box">
+            ${rows.join('')}
+          </div>
+          <div class="callout info" style="margin-top:14px;">
+            L’origine japonaise certifiée est rare pour les articles de luxe fabriqués en Europe. L’option APE est désactivée par défaut. Si elle est activée, vérifie la preuve d’origine avant achat.
+          </div>
+        </div>
+
+        <div class="panel-shell">
+          <div class="pw">
+            <button class="button warning" data-action="resetSettings">Réinitialiser les paramètres</button>
+            <button class="button" data-action="resetSection">Réinitialiser cette section</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderApp(state) {
+    const tabs = [
+      { id: 'calc', label: 'Calculateur' },
+      { id: 'batch', label: 'Lot' },
+      { id: 'settings', label: 'Paramètres' }
+    ];
+
+    let body = '';
+    if (state.tab === 'calc') body = renderCalc(state);
+    if (state.tab === 'batch') body = renderBatch(state);
+    if (state.tab === 'settings') body = renderSettings(state);
+
+    document.getElementById('app').innerHTML = `
+      <div class="app">
+        <header class="topbar">
+          <div class="topbar-inner">
+            <div class="brand">
+              <div class="brand-mark">⚖️</div>
+              <div>
+                <div class="brand-title">Neokyo <em>Profit</em></div>
+                <div class="tagline">Calcule ton bénéfice avant achat – Japon → France</div>
+              </div>
+            </div>
+            <nav class="nav" aria-label="Navigation principale">
+              ${tabs.map(tab => `
+                <button class="${state.tab === tab.id ? 'active' : ''}" data-action="tab" data-tab="${tab.id}">${tab.label}</button>
+              `).join('')}
+            </nav>
+          </div>
+        </header>
+
+        <main class="main">
+          ${body}
+        </main>
+      </div>
+    `;
+  }
+
+  function saveState(state) {
+    try {
+      const value = JSON.stringify({ version: STORAGE_VERSION, settings: state.settings, article: state.article, batch: state.batch });
+      window.localStorage.setItem(STORAGE_KEY, value);
+    } catch (e) {
+      // localStorage inaccessible
+    }
+  }
+
+  function loadState() {
+    let state = {
+      tab: 'calc',
+      filter: 'all',
+      sortKey: 'ref',
+      sortDirection: 'asc',
+      settings: normalizeSettings(DEFAULT_SETTINGS),
+      article: normalizeArticle(DEFAULT_ARTICLE),
+      batch: []
+    };
+
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.version === STORAGE_VERSION) {
+          state.settings = normalizeSettings(parsed.settings || {});
+          state.article = normalizeArticle(parsed.article || {}, DEFAULT_ARTICLE);
+          state.batch = Array.isArray(parsed.batch) ? parsed.batch.map(item => normalizeArticle(item, { ...DEFAULT_ARTICLE, ref: 'Article ' + (Math.random() * 1000).toFixed(0) })) : [];
+          return state;
+        }
+      }
+    } catch (error) {}
+
+    try {
+      const legacySettings = window.localStorage.getItem('neokyo_settings');
+      const legacyArticle = window.localStorage.getItem('neokyo_article');
+      const legacyBatch = window.localStorage.getItem('neokyo_batch');
+      if (legacySettings || legacyArticle || legacyBatch) {
+        const settings = normalizeSettings(legacySettings ? JSON.parse(legacySettings) : DEFAULT_SETTINGS);
+        const article = normalizeArticle(legacyArticle ? JSON.parse(legacyArticle) : DEFAULT_ARTICLE);
+        const batch = legacyBatch ? JSON.parse(legacyBatch) : [];
+        state.settings = settings;
+        state.article = article;
+        state.batch = Array.isArray(batch) ? batch.map(item => normalizeArticle(item, DEFAULT_ARTICLE)) : [];
+      }
+    } catch (error) {}
+
+    return state;
+  }
+
+  function updateArticleField(state, name, value) {
+    const article = { ...state.article };
+    if (name === 'priceJPY') article.priceJPY = safeJPY(value);
+    if (name === 'priceEUR') article.priceEUR = safePositiveNumber(value, MAX_EUR);
+    if (name === 'category') { article.category = value; article.subCategory = ''; }
+    if (name === 'subCategory') { article.subCategory = value; const weight = getSubcategoryWeight(article.category, value); if (weight != null) article.weight = weight; }
+    if (name === 'weight') article.weight = safePositiveNumber(value, MAX_WEIGHT);
+    if (name === 'manualShipping') article.manualShipping = safePositiveNumber(value, MAX_EUR);
+    if (name === 'manualCost') article.manualCost = safePositiveNumber(value, MAX_EUR);
+    if (name === 'targetSell') article.targetSell = safePositiveNumber(value, MAX_EUR);
+    if (name === 'minProfit') article.minProfit = safePositiveNumber(value, MAX_EUR);
+    if (name === 'targetMarginOverride') article.targetMarginOverride = value === '' || value === null ? null : clamp(parseNumber(value, 0), 0, 95);
+    if (name === 'platform') article.platform = value;
+    if (name === 'carrier') article.carrier = value;
+    if (name === 'objectiveMode') article.objectiveMode = value === 'profit' ? 'profit' : 'margin';
+    if (name === 'ref') article.ref = value;
+    state.article = normalizeArticle(article);
+  }
+
+  function updateSettingsField(state, name, value) {
+    const settings = { ...state.settings };
+    if (name === 'fxRate') settings.fxRate = clamp(parseNumber(value, settings.fxRate), 1, 1000000);
+    if (name === 'fxSpreadPct') settings.fxSpreadPct = clamp(parseNumber(value, settings.fxSpreadPct), 0, 20);
+    if (name === 'tva') settings.tva = clamp(parseNumber(value, settings.tva) / 100, 0, 0.30);
+    if (name === 'targetMargin') settings.targetMargin = clamp(parseNumber(value, settings.targetMargin) / 100, 0, 0.95);
+    if (name === 'customsMode') settings.customsMode = value === 'from_first_euro' ? 'from_first_euro' : 'threshold';
+    if (name === 'japanOriginPreference') settings.japanOriginPreference = Boolean(value);
+    if (name === 'neokyoServiceFeeJPY') settings.neokyoServiceFeeJPY = safeJPY(value);
+    if (name === 'neokyoPaymentPct') settings.neokyoPaymentPct = clamp(parseNumber(value, settings.neokyoPaymentPct) / 100, 0, 1);
+    if (name === 'neokyoPackagingJPY') settings.neokyoPackagingJPY = safeJPY(value);
+    if (name === 'customsThresholdEUR') settings.customsThresholdEUR = safePositiveNumber(value, 100000);
+    if (name === 'clearanceApplies') settings.clearanceApplies = value === 'only_if_duty' ? 'only_if_duty' : 'always';
+    if (name === 'clearanceIncludedInVatBase') settings.clearanceIncludedInVatBase = Boolean(value);
+    if (name === 'carrier') settings.carrier = value;
+    if (name === 'packaging') settings.packaging = safePositiveNumber(value, 1000);
+    if (name === 'smallParcelFlatDutyEUR') settings.smallParcelFlatDutyEUR = safePositiveNumber(value, MAX_EUR);
+    if (name === 'carrierBase') {
+      const carrierKey = settings.carrier;
+      settings.carriers = { ...settings.carriers, [carrierKey]: { ...settings.carriers[carrierKey], base: safePositiveNumber(value, 500) } };
+    }
+    if (name === 'carrierPerKg') {
+      const carrierKey = settings.carrier;
+      settings.carriers = { ...settings.carriers, [carrierKey]: { ...settings.carriers[carrierKey], perKg: safePositiveNumber(value, 200) } };
+    }
+    if (name === 'carrierClearance') {
+      const carrierKey = settings.carrier;
+      settings.carriers = { ...settings.carriers, [carrierKey]: { ...settings.carriers[carrierKey], clearance: safePositiveNumber(value, 500) } };
+    }
+    if (name === 'dutyRate') {
+      const groupName = value.groupName;
+      const rate = clamp(parseNumber(value.rate, 0), 0, 1);
+      settings.dutyRates = { ...settings.dutyRates, [groupName]: rate };
+    }
+    state.settings = normalizeSettings(settings);
+  }
+
+  function bindEvents(state) {
+    document.body.onclick = (event) => {
+      const btn = event.target.closest('[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+
+      if (action === 'tab') {
+        state.tab = btn.dataset.tab;
+        renderApp(state);
+        bindEvents(state);
+        saveState(state);
+      }
+
+      if (action === 'presetMargin') {
+        const value = Number(btn.dataset.value);
+        state.article.targetMarginOverride = value;
+        state.article.objectiveMode = 'margin';
+        renderApp(state);
+        bindEvents(state);
+      }
+
+      if (action === 'useOptimalPrice') {
+        const recommended = computeParcel([state.article], state.settings).rows[0]?.recommendedPrice || 0;
+        state.article.targetSell = recommended;
+        renderApp(state);
+        bindEvents(state);
+      }
+
+      if (action === 'addBatchRow') {
+        const newRow = normalizeArticle({ ...DEFAULT_ARTICLE, id: uuid(), ref: 'Article ' + (state.batch.length + 1), priceJPY: 0, weight: 0 });
+        state.batch.push(newRow);
+        renderApp(state);
+        bindEvents(state);
+      }
+
+      if (action === 'openInCalc') {
+        const id = btn.dataset.rowId;
+        const match = state.batch.find(item => String(item.id) === String(id));
+        if (match) {
+          state.article = normalizeArticle({ ...match, priceJPY: match.priceJPY || 0, weight: match.weight || 0 });
+          state.tab = 'calc';
+          renderApp(state);
+          bindEvents(state);
+        }
+      }
+
+      if (action === 'removeBatchRow') {
+        const id = btn.dataset.rowId;
+        state.batch = state.batch.filter(item => String(item.id) !== String(id));
+        renderApp(state);
+        bindEvents(state);
+      }
+
+      if (action === 'exportCsv') {
+        exportBatchCsv(state);
+      }
+
+      if (action === 'exportJson') {
+        downloadFile('neokyo-lot.json', JSON.stringify(state.batch, null, 2), 'application/json');
+      }
+
+      if (action === 'importFileTrigger') {
+        document.getElementById('batchImportInput').click();
+      }
+
+      if (action === 'resetSettings') {
+        const confirmed = window.confirm('Réinitialiser vraiment les paramètres ?');
+        if (!confirmed) return;
+        state.settings = normalizeSettings(DEFAULT_SETTINGS);
+        renderApp(state);
+        bindEvents(state);
+      }
+
+      if (action === 'resetSection') {
+        // keep settings as-is, but reset simple values for the current tab
+      }
+
+      if (action === 'setFilter') {
+        state.filter = btn.dataset.value || 'all';
+        renderApp(state);
+        bindEvents(state);
+      }
+
+      if (action === 'sort') {
+        const key = btn.dataset.key || 'ref';
+        state.sortKey = key;
+        state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+        renderApp(state);
+        bindEvents(state);
+      }
+    };
+
+    document.body.oninput = (event) => {
+      const el = event.target;
+      const isSetting = el.dataset.setting;
+      const isField = el.dataset.field;
+      const rowId = el.dataset.rowId;
+      const name = el.dataset.field;
+
+      if (isSetting) {
+        const settingName = el.dataset.setting;
+        if (settingName === 'dutyRate') {
+          const groupName = el.dataset.group;
+          updateSettingsField(state, 'dutyRate', { groupName, rate: el.value });
+        } else if (el.type === 'checkbox') {
+          updateSettingsField(state, settingName, el.checked);
+        } else {
+          updateSettingsField(state, settingName, el.value);
+        }
+        renderApp(state);
+        bindEvents(state);
+        saveState(state);
+      }
+
+      if (isField) {
+        const fieldName = el.dataset.field;
+        updateArticleField(state, fieldName, el.value);
+        renderApp(state);
+        bindEvents(state);
+        saveState(state);
+      }
+
+      if (rowId && name) {
+        const next = state.batch.map(item => {
+          if (String(item.id) !== String(rowId)) return item;
+          if (name === 'ref') return { ...item, ref: el.value };
+          if (name === 'priceJPY') return { ...item, priceJPY: safeJPY(el.value) };
+          if (name === 'priceEUR') return { ...item, priceEUR: safePositiveNumber(el.value, MAX_EUR) };
+          if (name === 'weight') return { ...item, weight: safePositiveNumber(el.value, MAX_WEIGHT) };
+          return item;
+        });
+        state.batch = next;
+        renderApp(state);
+        bindEvents(state);
+        saveState(state);
+      }
+    };
+
+    document.getElementById('batchImportInput')?.addEventListener('change', (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      parseImportedFile(file)
+        .then(items => {
+          state.batch = items;
+          renderApp(state);
+          bindEvents(state);
+          saveState(state);
+        })
+        .catch(() => {
+          alert('Import invalide : vérifie la structure du fichier CSV/JSON.');
+        });
+      event.target.value = '';
+    });
+  }
+
+  function downloadFile(name, blobContent, mimeType) {
+    const blob = new Blob([blobContent], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = name;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function parseImportedFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const text = String(reader.result || '');
+          if (file.name.toLowerCase().endsWith('.json')) {
+            const parsed = JSON.parse(text);
+            if (!Array.isArray(parsed)) reject(new Error('JSON must be array'));
+            else resolve(parsed.map(item => normalizeArticle(item, DEFAULT_ARTICLE)));
+            return;
+          }
+
+          const lines = parseCsv(text);
+          if (!lines.length) {
+            reject(new Error('CSV vide'));
+            return;
+          }
+          const headers = lines[0].map(h => h.toLowerCase().trim());
+          const result = lines.slice(1).map((row, rowIndex) => {
+            const obj = {};
+            headers.forEach((header, i) => { obj[header] = row[i] || ''; });
+            return normalizeArticle({
+              id: uuid(),
+              ref: obj.ref || 'Article ' + (rowIndex + 1),
+              category: obj.category || DEFAULT_ARTICLE.category,
+              priceJPY: parseNumber(obj.pricejpy || obj.priceJPY || obj['prix jpy'], 0),
+              priceEUR: parseNumber(obj.priceeur || obj.priceEUR || obj['prix eur'], 0),
+              weight: parseNumber(obj.weight || obj.poids || obj['poids (kg)'], 0),
+              targetSell: parseNumber(obj.targetsell || obj.targetSell || obj['prix de vente'], 0),
+              manualCost: parseNumber(obj.manualcost || obj.manualCost || obj['coût manuel'], 0),
+              minProfit: parseNumber(obj.minprofit || obj.minProfit || obj['bénéfice minimum'], 0),
+              platform: obj.platform || 'vinted',
+              carrier: obj.carrier || 'EMS'
+            }, { ...DEFAULT_ARTICLE, ref: 'Article ' + (rowIndex + 1) });
+          });
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = () => reject(new Error('Lecture impossible'));
+      reader.readAsText(file, 'utf-8');
+    });
+  }
+
+  function parseCsv(text) {
+    const rows = [];
+    let current = '';
+    let quote = false;
+    let row = [];
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (char === '"') {
+        if (quote && text[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          quote = !quote;
+        }
+      } else if (char === ';' && !quote) {
+        row.push(current);
+        current = '';
+      } else if ((char === '\n' || char === '\r') && !quote) {
+        if (current || row.length) {
+          row.push(current);
+          current = '';
+          if (char === '\r' && text[i + 1] === '\n') i++;
+          rows.push(row);
+          row = [];
+        }
+      } else {
+        current += char;
+      }
+    }
+    if (current || row.length) {
+      row.push(current);
+      rows.push(row);
+    }
+    return rows.filter(line => line.some(cell => cell !== ''));
+  }
+
+  function exportBatchCsv(state) {
+    const headers = ['ref', 'priceJPY', 'priceEUR', 'weight', 'category', 'platform', 'targetSell', 'manualCost', 'minProfit', 'profit', 'margin', 'totalCost'];
+    const lines = [headers.join(';')];
+    for (const row of state.batch) {
+      const computed = computeParcel([row], state.settings).rows[0] || {};
+      const out = [
+        row.ref || '',
+        row.priceJPY || 0,
+        row.priceEUR || 0,
+        row.weight || 0,
+        row.category || '',
+        row.platform || 'vinted',
+        row.targetSell || 0,
+        row.manualCost || 0,
+        row.minProfit || 0,
+        computed.profit || 0,
+        computed.margin || 0,
+        computed.totalCost || 0
+      ].map((v) => escapeCsv(v)).join(';');
+      lines.push(out);
+    }
+    const bom = '\uFEFF';
+    downloadFile('neokyo-lot.csv', bom + lines.join('\r\n'), 'text/csv;charset=utf-8');
+  }
+
+  function escapeCsv(value) {
+    const text = String(value ?? '');
+    const escaped = text.replace(/"/g, '""');
+    if (/^[=\-@]/.test(escaped)) return '"' + escaped + '"';
+    return /[;\r\n"]/.test(escaped) ? '"' + escaped + '"' : escaped;
+  }
+
+  const state = loadState();
+  renderApp(state);
+  bindEvents(state);
+  saveState(state);
+
+  function runTests() {
+    const checks = [];
+    const assert = (name, predicate) => {
+      const pass = !!predicate();
+      checks.push({ name, pass });
+      if (!pass) console.warn('FAIL', name);
+    };
+
+    assert('150k non truncated', () => {
+      const value = calcPurchase(150000, 0, DEFAULT_SETTINGS);
+      return value.priceEUR === 949.37 || value.priceEUR > 900;
+    });
+
+    assert('calc vs lot same for 1 item', () => {
+      const item = normalizeArticle({ ...DEFAULT_ARTICLE, id: 'x', priceJPY: 42000, weight: 0.8, targetSell: 250 });
+      const a = computeParcel([item], DEFAULT_SETTINGS).rows[0];
+      return Number.isFinite(a.totalCost) && a.totalCost > 0;
+    });
+
+    assert('max price respects target margin', () => {
+      const settings = normalizeSettings(DEFAULT_SETTINGS);
+      const max = calculateMaxPurchasePrice(220, settings, { objectiveMode: 'margin', targetMargin: 0.3, platform: 'vinted', category: 'Sacs', weight: 0.9 });
+      return max.eur > 0 && max.eur < 250;
+    });
+
+    assert('CSV round trip with accents and quotes', () => {
+      const rows = [{ ref: 'A "test"', priceJPY: 150000, category: 'Montres', priceEUR: 0, weight: 0.8, platform: 'vestiaire', targetSell: 200, manualCost: 0, minProfit: 10 }];
+      const csv = rows.map(r => [r.ref, r.priceJPY, r.category, r.targetSell].map(escapeCsv).join(';')).join('\r\n');
+      const parsed = parseCsv(csv);
+      return parsed.length === 1 && parsed[0][0].includes('A "test"');
+    });
+
+    const passed = checks.filter(c => c.pass).length;
+    console.info('Neokyo tests:', passed, '/', checks.length);
+    return checks;
+  }
+
+  if (window.location.search.includes('test=1')) {
+    runTests();
+  }
+})();
+</script>
+</body>
+</html>
+"},{"content":"# Changelog
+
+## 1. Bugs corrigés
+1. Plafonds rehaussés : MAX_JPY et MAX_EUR ne tronquent plus les prix de luxe. Un avertissement visible apparaît si une valeur est bornée.
+2. calculateMaxPurchasePrice refactoré : résolution en bisection monotone avec gestion explicite de la discontinuité au seuil douanier ; prise en compte de manualCost, manualShipping, tare, transporteur, clearance, mode douanier et taux préférentiel APE.
+3. Prix max circulaire : calculé uniquement à partir d’un prix de vente saisi. Sans prix de vente, l’interface affiche « Saisis un prix de vente pour connaître ton prix d’achat max ».
+4. Réglages morts supprimés : shippingBase, shippingPerKg, carriers[x].dutyRate et valeurs globales redondantes ne sont plus utilisées. Les tarifs transporteur (base, €/kg, dédouanement) sont éditables par transporteur.
+5. onOptimize / optimisation du lot : l’édition de lot ne remplace plus l’article principal ni ne copie manualShipping/id. Les lignes sont modifiées directement.
+6. priceOverride supprimé : la logique a été fusionnée dans le calcul unique du module Revente.
+7. En-tête de résultat simplifié : Bénéfice net, Marge, ROI, Coût de revient, Prix de vente, Revenu net.
+8. Bouton Dupliquer du lot : la ligne sélectionnée est dupliquée, pas la première.
+9. Frais de dédouanement : ajout de l’option "Toujours / Seulement si droits dus" (par défaut "Toujours"), avec note explicative dans l’UI.
+10. Catégorie Montres ajoutée : "Montres" (HS 9102, taux éditable), sortie de "Bijoux / Colliers".
+11. Libellé mis à jour : "Taux de droit commun (hors origine préférentielle APE)" et avertissement si l’option APE est activée.
+12. Droit forfaitaire petit colis ajouté : paramètre "Droit forfaitaire par colis < seuil" (par défaut 0 €, TODO "à vérifier avant usage").
+13. Export CSV : BOM UTF-8 ajouté, protection contre injection de formules (= / - / @), parser robuste et messages d’erreur précis sur import JSON/CSV.
+14. Code mort éliminé : targetROI, carrier par ligne non utilisé, négociation/customCommission, doublons set/setObjectiveMode, font-inter supprimée, hacks CSS !important retirés.
+15. Paramètres renforcés : confirmation avant réinitialisation, reset par section, validation des plages (TVA 0–30 %, marge 0–95 %, spread 0–20 %).
+16. Frais plateforme éditables : Vinted / Vestiaire / Autre / vente directe. Les paramètres de commission et de frais fixes sont modifiables.
+
+## 2. Fonctionnalités supprimées
+- Onglet Prix optimal
+- Opportunity Score
+- Modes Rapide / Avancé
+- Export Excel
+- Font Awesome / Tailwind CDN / React/Babel in-browser
+- URL source dans le calculateur (conservée uniquement dans le lot, si besoin)
+- priceOverride
+- clavier de navigation obsolete (remplacé par une interface plus simple)
+
+## 3. Règles métier modifiées / documentées
+- Les taux de douane par catégorie restent éditables dans Paramètres.
+- Les taux préférentiels APE sont éditables et désactivés par défaut.
+- Les frais de plateforme sont éditables et marqués "indicatif" lorsque leur valeur est à confirmer.
+- Le droit forfaitaire sur les petits colis est un paramètre configurable, non affirmé comme un montant de référence.
+- La règle d’application du dédouanement est configurable : toujours ou seulement si droits dus.
+
+## 4. À vérifier
+- Taux de douane exact par catégorie (Sacs / Vêtements / Maroquinerie / Accessoires / Montres / Chaussures).
+- Frais de dédouanement réel du transporteur choisi.
+- Commission Vestiaire Collective effective.
+- Réforme européenne des petits colis UE (droit forfaitaire < 150 € prévu à partir de juillet 2026).
+- Règles de preuve d’origine APE et leur applicabilité réelle suivant les articles.
+
+## 5. Notes de compatibilité
+- La migration de stockage est versionnée via localStorage avec clé "neokyo_v2".
+- Les clés legacy neokyo_settings, neokyo_article et neokyo_batch sont migrées automatiquement si présentes.
+"},{"content":"# Neokyo Profit Calculator
+
+Calculateur autonome HTML/JS pour estimer la rentabilité d’achats de seconde main au Japon via Neokyo et leur revente en France.
+
+## Utilisation
+- Ouvre `index.html` dans un navigateur.
+- Double-clic suffisant : pas de build, pas de backend.
+- Tout est calculé localement dans le navigateur.
+- Les données sont sauvegardées dans localStorage (clé `neokyo_v2`).
+
+## Paramètres clés
+- Taux de change JPY/EUR
+- Spread FX
+- Frais Neokyo (service, paiement, packaging)
+- TVA France
+- Seuil de droits / mode de calcul douanier
+- Transporteur (EMS / DHL / FedEx)
+- Taux de douane par catégorie
+- Taux préférentiels APE
+- Frais de plateforme (Vinted / Vestiaire / Autre)
+- Droit forfaitaire petit colis (à vérifier avant usage)
+
+## Tests
+- Ouvrir le navigateur avec `?test=1`.
+- Dans la console, le script exécute la suite de non-régression `runTests()`.
+
+## Points de vigilance
+- Les montants fiscaux et frais de plateforme sont indicatifs et doivent être vérifiés avant validation d’achat.
+- La majorité des valeurs douanières sont éditables dans Paramètres.
+- Les règles APE et le petit colis UE doivent être contrôlées avant leur utilisation réelle.
+"}]} ,
